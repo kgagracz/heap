@@ -1,0 +1,117 @@
+#include <iostream>
+#include <queue>
+#include <vector>
+
+class Node {
+public:
+    int value; // wartość węzła
+    Node* left = nullptr; // wskaźnik na lewe dziecko
+    Node* right = nullptr; // wskaźnik na prawe dziecko
+
+    // Konstruktor węzła
+    Node(int value) : value(value) {} // inicjalizacja wartości węzła
+
+    // Destruktor węzła
+    ~Node() {
+        delete left; // usunięcie lewego dziecka
+        delete right; // usunięcie prawego dziecka
+    }
+};
+
+class BinaryHeap {
+public:
+    Node* root = nullptr; // korzeń kopca
+
+    // Destruktor kopca
+    ~BinaryHeap() {
+        delete root; // usunięcie korzenia
+    }
+
+    // Dodawanie elementów do kopca
+    void insert(int value) {
+        if (root == nullptr) { // jeśli kopiec jest pusty
+            root = new Node(value); // utworzenie korzenia
+        }
+        else {
+            std::queue<Node*> q; // utworzenie kolejki do przechowywania węzłów
+            q.push(root); // dodanie korzenia do kolejki
+
+            // przeszukiwanie kopca w poszukiwaniu miejsca dla nowego węzła
+            while (!q.empty()) {
+                Node* node = q.front(); // pobranie pierwszego węzła z kolejki
+                q.pop(); // usunięcie węzła z kolejki
+
+                if (node->left == nullptr) { // jeśli lewe dziecko jest puste
+                    node->left = new Node(value); // dodanie nowego węzła jako lewego dziecka
+                    break;
+                }
+                else if (node->right == nullptr) { // jeśli prawe dziecko jest puste
+                    node->right = new Node(value); // dodanie nowego węzła jako prawego dziecka
+                    break;
+                }
+                else { // jeśli oba dzieci są zajęte
+                    q.push(node->left); // dodanie lewego dziecka do kolejki
+                    q.push(node->right); // dodanie prawego dziecka do kolejki
+                }
+            }
+        }
+
+        // przywrócenie własności kopca
+        heapify(root);
+    }
+
+    // Wyświetlanie elementów kopca
+    void printHeap() {
+        printHeap(root);
+        std::cout << std::endl;
+    }
+
+private:
+    // Przywrócenie własności kopca
+    void heapify(Node* node) {
+        if (node == nullptr) { // jeśli węzeł jest pusty
+            return;
+        }
+
+        // porównanie wartości węzła z wartościami jego dzieci
+        if (node->left != nullptr && node->value < node->left->value) {
+            std::swap(node->value, node->left->value); // zamiana wartości węzła z wartością lewego dziecka
+        }
+
+        if (node->right != nullptr && node->value < node->right->value) {
+            std::swap(node->value, node->right->value); // zamiana wartości węzła z
+            // zamiana wartości węzła z wartością prawego dziecka
+        }
+
+        heapify(node->left); // rekurencyjne przywrócenie własności kopca dla lewego poddrzewa
+        heapify(node->right); // rekurencyjne przywrócenie własności kopca dla prawego poddrzewa
+    }
+
+    // Wyświetlanie elementów kopca
+    void printHeap(Node* node) {
+        if (node == nullptr) { // jeśli węzeł jest pusty
+            return;
+        }
+
+        std::cout << node->value << " "; // wyświetlenie wartości węzła
+        printHeap(node->left); // wyświetlanie lewego poddrzewa
+        printHeap(node->right); // wyświetlanie prawego poddrzewa
+    }
+};
+
+int main() {
+    BinaryHeap bh; // utworzenie kopca binarnego
+
+    // dodanie elementów do kopca
+    bh.insert(5);
+    bh.insert(2);
+    bh.insert(9);
+    bh.insert(1);
+    bh.insert(5);
+    bh.insert(6);
+
+    // wyświetlenie elementów kopca
+    bh.printHeap();
+
+    return 0;
+}
